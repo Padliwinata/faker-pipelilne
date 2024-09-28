@@ -1,6 +1,5 @@
 from faker import Faker
 import random
-import json
 
 
 fake = Faker()
