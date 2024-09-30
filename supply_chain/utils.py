@@ -70,3 +70,49 @@ def generate_fake_transaction():
     }
 
     return transaction_data
+
+
+def convert_transaction_data(original_data):
+    """
+    :param original_data: the original data param is customized to generate_fake_transaction data
+    :return: flattened generate_fake_transaction return value
+    """
+    # Flattening customer data
+    customer_data = original_data.get("customer", {})
+    customer_contact = customer_data.get("contact", {})
+
+    # Flattening payment data
+    payment_data = original_data.get("payment", {})
+
+    # Counting the number of items
+    items = original_data.get("items", [])
+    number_of_items = len(items)
+
+    # Creating the flattened data structure
+    flattened_data = {
+        "transaction_id": original_data.get("transaction_id"),
+        "timestamp": original_data.get("timestamp"),
+        "store_id": original_data.get("store_id"),
+        "terminal_id": original_data.get("terminal_id"),
+        "customer_id": customer_data.get("customer_id"),
+        "customer_name": customer_data.get("name"),
+        "customer_email": customer_contact.get("email"),
+        "customer_phone": customer_contact.get("phone"),
+        "payment_method": payment_data.get("method"),
+        "payment_amount": payment_data.get("amount"),
+        "payment_tax_amount": payment_data.get("tax_amount"),
+        "payment_discounts": payment_data.get("discounts"),
+        "number_of_items": number_of_items,
+        "transaction_status": original_data.get("status"),
+        "employee_id": original_data.get("employee", {}).get("employee_id"),
+        "employee_name": original_data.get("employee", {}).get("name"),
+        "loyalty_points": original_data.get("loyalty_points"),
+        "notes": original_data.get("notes"),
+        "created_at": original_data.get("created_at"),
+        "updated_at": original_data.get("updated_at"),
+        "created_by": original_data.get("created_by"),
+        "updated_by": original_data.get("updated_by")
+    }
+
+    return flattened_data
+

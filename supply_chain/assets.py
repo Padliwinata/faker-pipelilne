@@ -4,10 +4,11 @@ import os
 from dagster import asset, MaterializeResult
 
 from resources import TransactionResource
+from utils import convert_transaction_data
 
 
 @asset
-def transaction_data(resource: TransactionResource) -> MaterializeResult:
+def transaction_data_json(resource: TransactionResource) -> MaterializeResult:
     data = resource.get_transactions_data()
 
     number_of_items = sum([len(x['items']) for x in data])
@@ -23,6 +24,14 @@ def transaction_data(resource: TransactionResource) -> MaterializeResult:
             "number_of_items_sold": number_of_items
         }
     )
+
+
+@asset(deps=[transaction_data_json])
+def transaction_data_csv() -> MaterializeResult:
+    with open('data/transaction_data.json', 'r') as f:
+        data = json.load(f)
+
+    
 
 
 # @asset(deps=[data_from_api])
