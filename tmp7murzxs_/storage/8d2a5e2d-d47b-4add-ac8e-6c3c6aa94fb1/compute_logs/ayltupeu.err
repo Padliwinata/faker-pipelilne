@@ -1,0 +1,6 @@
+[32m2024-10-01 01:13:46 +0700[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 8d2a5e2d-d47b-4add-ac8e-6c3c6aa94fb1 - 45669 - LOGS_CAPTURED - Started capturing logs in process (pid: 45669).
+[32m2024-10-01 01:13:46 +0700[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 8d2a5e2d-d47b-4add-ac8e-6c3c6aa94fb1 - 45669 - transaction_data_json - STEP_START - Started execution of step "transaction_data_json".
+[32m2024-10-01 01:13:46 +0700[0m - dagster - [34mINFO[0m - __ASSET_JOB - 8d2a5e2d-d47b-4add-ac8e-6c3c6aa94fb1 - transaction_data_json - Data ingested
+[32m2024-10-01 01:13:46 +0700[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 8d2a5e2d-d47b-4add-ac8e-6c3c6aa94fb1 - 45669 - transaction_data_json - STEP_OUTPUT - Yielded output "result" of type "Nothing". (Type check passed).
+[32m2024-10-01 01:13:46 +0700[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 8d2a5e2d-d47b-4add-ac8e-6c3c6aa94fb1 - 45669 - transaction_data_json - ASSET_MATERIALIZATION - Materialized value transaction_data_json.
+[32m2024-10-01 01:13:46 +0700[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 8d2a5e2d-d47b-4add-ac8e-6c3c6aa94fb1 - 45669 - transaction_data_json - STEP_SUCCESS - Finished execution of step "transaction_data_json" in 30ms.

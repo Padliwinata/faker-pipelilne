@@ -2,7 +2,7 @@ from random import Random
 
 from dagster import ConfigurableResource, MaterializeResult
 
-from utils import generate_fake_transaction
+from .utils import generate_fake_transaction
 
 
 class TransactionResource(ConfigurableResource):
@@ -16,6 +16,9 @@ class TransactionResource(ConfigurableResource):
         number = self.random.randrange(40, 50)
         data = [generate_fake_transaction() for _ in range(number)]
         return data
+
+
+
 
 
 
