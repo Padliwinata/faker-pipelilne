@@ -46,6 +46,20 @@ def transaction_data_csv() -> MaterializeResult:
     )
 
 
+@asset(deps=[transaction_data_csv])
+def clean_csv_data():
+    df = pd.read_csv('data/transaction_data.csv')
+
+    filtered_df = df[df['transaction_status'] == 'completed']
+    filtered_df.to_csv('data/completed_transaction_data.csv', index=False)
+
+    return MaterializeResult(
+        metadata={
+            'clean_data_num': len(filtered_df),
+            'preview': MetadataValue.md(filtered_df.head().to_markdown())
+        }
+    )
+
 
 # @asset(deps=[data_from_api])
 # def data_from_json() -> MaterializeResult:
