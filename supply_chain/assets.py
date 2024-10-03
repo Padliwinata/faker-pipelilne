@@ -1,7 +1,7 @@
 import json
 import os
 
-from dagster import asset, MaterializeResult, MetadataValue, AssetExecutionContext
+from dagster import asset, MaterializeResult, MetadataValue, AssetExecutionContext, AssetIn, Output
 import pandas as pd
 
 from .resources import TransactionResource
@@ -9,7 +9,7 @@ from .utils import convert_transaction_data
 
 
 @asset
-def transaction_data_json(context: AssetExecutionContext, resource: TransactionResource) -> MaterializeResult:
+def transaction_data_json(context: AssetExecutionContext, resource: TransactionResource) -> Output:
     data = resource.get_transactions_data()
     context.log.info("Data ingested")
 
@@ -20,9 +20,35 @@ def transaction_data_json(context: AssetExecutionContext, resource: TransactionR
     with open('data/transaction_data.json', 'w') as f:
         json.dump(data, f)
 
-    return MaterializeResult(
+    # return MaterializeResult(
+    #     metadata={
+    #         "number_of_transactions": len(data),
+    #         "number_of_items_sold": number_of_items
+    #     }
+    # )
+
+    return Output(
+        value=data,
         metadata={
             "number_of_transactions": len(data),
+            "number_of_items_sold": number_of_items
+        }
+    )
+
+
+@asset(ins={'transaction_data': AssetIn('transaction_data_json')})
+def ingest_more_data(transaction_data: list, resource: TransactionResource) -> MaterializeResult:
+    if len(transaction_data) <= 45:
+        transaction_data.extend(resource.get_transactions_data())
+
+    number_of_items = sum([len(x['items']) for x in data])
+
+    with open('data/transaction_data.json', 'w') as f:
+        json.dump(transaction_data, f)
+
+    return MaterializeResult(
+        metadata={
+            "number_of_transactions": len(transaction_data),
             "number_of_items_sold": number_of_items
         }
     )
