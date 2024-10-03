@@ -41,7 +41,7 @@ def ingest_more_data(transaction_data: list, resource: TransactionResource) -> M
     if len(transaction_data) <= 45:
         transaction_data.extend(resource.get_transactions_data())
 
-    number_of_items = sum([len(x['items']) for x in data])
+    number_of_items = sum([len(x['items']) for x in transaction_data])
 
     with open('data/transaction_data.json', 'w') as f:
         json.dump(transaction_data, f)
