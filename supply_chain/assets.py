@@ -120,5 +120,48 @@ def transformed_inventory_data(context: AssetExecutionContext, inventory_resourc
 
 
 @asset(deps=[cleaned_sales_data])
-def sales_summary()
+def sales_summary(context: AssetExecutionContext, data: dict) -> Output:
+    summarized_data = data
+    return Output(
+        value=data,
+        metadata=MetadataValue.json(summarized_data[0])
+    )
+
+
+@asset
+def customer_segmentation(context: AssetExecutionContext, customer_resource: CustomerManagementResource) -> Output:
+    data = customer_resource.get_crm_data()
+    return Output(
+        value=data,
+        metadata=MetadataValue.json(data[0])
+    )
+
+
+@asset(deps=[sales_summary])
+def payment_reconciliation_report(context: AssetExecutionContext, data: dict) -> Output:
+    reconciliation_report = data
+    return Output(
+        value=reconciliation_report,
+        metadata=MetadataValue.json(reconciliation_report[0])
+    )
+
+
+@asset(deps=[transformed_inventory_data])
+def inventory_report(context: AssetExecutionContext, data: dict) -> Output:
+    inventory_summary = data
+    return Output(
+        value=inventory_summary,
+        metadata=MetadataValue.json(inventory_summary[0])
+    )
+
+
+@asset(deps=[customer_segmentation, payment_reconciliation_report, inventory_report])
+def final_reporting(context: AssetExecutionContext, customer_data: dict, payment_data: dict, inventory_data: dict) -> Output:
+    return MaterializeResult(
+        metadata={
+            'customer_data': customer_data,
+            'payment_data': payment_data,
+            'inventory_data': inventory_data
+        }
+    )
 
