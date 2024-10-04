@@ -1,8 +1,39 @@
 from faker import Faker
+import json
+import os
 import random
 
 
 fake = Faker()
+
+PAYMENT_FILE_PATH = 'data/payment_data.json'
+
+
+def read_payment_data():
+    """
+    Reads payment data from the JSON file.
+
+    Returns:
+        List[dict]: A list of payment transactions.
+    """
+    if not os.path.exists(PAYMENT_FILE_PATH):
+        return []
+
+    with open(PAYMENT_FILE_PATH, "r") as file:
+        payment_data = json.load(file)
+
+    return payment_data
+
+
+def write_payment_data(payments_data):
+    """
+    Writes payment data to a JSON file.
+
+    Args:
+        payments_data (List[dict]): The list of payment transactions to write.
+    """
+    with open(PAYMENT_FILE_PATH, "w") as file:
+        json.dump(payments_data, file, indent=4)
 
 
 def generate_fake_transaction():
@@ -70,6 +101,134 @@ def generate_fake_transaction():
     }
 
     return transaction_data
+
+
+def generate_fake_asset(num_items: int = 10):
+    """
+    Generates a list of fake inventory asset data.
+
+    Args:
+        num_items (int): The number of fake inventory items to generate.
+
+    Returns:
+        List[dict]: A list of dictionaries representing inventory items.
+    """
+    inventory_data = []
+
+    for _ in range(num_items):
+        item = {
+            "item_id": fake.uuid4(),
+            "product_name": fake.word().capitalize(),
+            "stock_quantity": fake.random_int(min=0, max=100),
+            "price_per_unit": round(fake.random_number(digits=2) + fake.random.random(), 2),
+            "supplier": fake.company(),
+            "last_stocked": fake.date_this_year(),
+        }
+        inventory_data.append(item)
+
+    return inventory_data
+
+
+def generate_fake_crm(num_customers: int = 10):
+    """
+    Generates a list of fake CRM data.
+
+    Args:
+        num_customers (int): The number of fake customer records to generate.
+
+    Returns:
+        List[dict]: A list of dictionaries representing CRM customer data.
+    """
+    crm_data = []
+
+    for _ in range(num_customers):
+        customer = {
+            "customer_id": fake.uuid4(),
+            "name": fake.name(),
+            "email": fake.email(),
+            "phone_number": fake.phone_number(),
+            "address": fake.address(),
+            "loyalty_points": fake.random_int(min=0, max=1000),
+            "total_spent": round(fake.random_number(digits=4) + fake.random.random(), 2),
+            "signup_date": fake.date_this_decade(),
+            "last_purchase": fake.date_this_year(),
+        }
+        crm_data.append(customer)
+
+    return crm_data
+
+
+def generate_fake_payments(num_payments: int = 1):
+    """
+    Retrieves payment data from the file. If the file contains fewer payments than requested,
+    it will return only the available payments.
+
+    Args:
+        num_payments (int): The number of payments to retrieve.
+
+    Returns:
+        List[dict]: A list of payment transactions.
+    """
+    payments = read_payment_data()
+    return payments[:num_payments]  # Return the first `num_payments` transactions
+
+
+def generate_fake_pos(num_transactions: int = 10):
+    """
+    Generates a list of fake POS transactions, including payment data. Payment data is written to a file.
+
+    Args:
+        num_transactions (int): The number of POS transactions to generate.
+
+    Returns:
+        List[dict]: A list of dictionaries representing POS transactions.
+    """
+    pos_data = []
+    payments_data = []
+
+    for _ in range(num_transactions):
+        # Simulate items purchased in a transaction
+        num_items = random.randint(1, 5)
+        items = []
+        total_amount = 0
+        for _ in range(num_items):
+            item = {
+                "item_name": fake.word().capitalize(),
+                "quantity": random.randint(1, 3),
+                "price_per_unit": round(fake.random_number(digits=2) + fake.random.random(), 2),
+            }
+            item_total = item["quantity"] * item["price_per_unit"]
+            total_amount += item_total
+            items.append(item)
+
+        # Generate payment information
+        payment_info = {
+            "transaction_id": fake.uuid4(),
+            "amount": round(total_amount, 2),
+            "payment_method": fake.random_element(elements=["Credit Card", "Debit Card", "PayPal", "Apple Pay"]),
+            "payment_status": fake.random_element(elements=["Completed", "Pending", "Failed"]),
+            "transaction_date": fake.date_time_this_year(),
+            "customer_id": fake.uuid4(),
+            "confirmation_code": fake.bothify(text='???-#####'),
+        }
+        payments_data.append(payment_info)  # Add payment info to the list
+
+        # Simulate the full POS transaction
+        transaction = {
+            "transaction_id": payment_info["transaction_id"],
+            "customer_id": payment_info["customer_id"],
+            "items": items,
+            "total_amount": round(total_amount, 2),
+            "payment_info": payment_info,
+            "transaction_date": payment_info["transaction_date"],
+        }
+
+        pos_data.append(transaction)
+
+    # Write the generated payments data to the file
+    write_payment_data(payments_data)
+
+    return pos_data
 
 
 def convert_transaction_data(original_data):

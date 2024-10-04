@@ -2,23 +2,51 @@ from random import Random
 
 from dagster import ConfigurableResource, MaterializeResult
 
-from .utils import generate_fake_transaction
+from .utils import generate_fake_transaction, generate_fake_asset, generate_fake_crm, generate_fake_pos
 
 
-class TransactionResource(ConfigurableResource):
-    seed: int
-
+class RandomizedConfigurableResource(ConfigurableResource):
+    seed: int = 2
+    num: int = 10
     @property
     def random(self) -> Random:
         return Random(self.seed)
 
-    def get_transactions_data(self):
-        number = self.random.randrange(40, 50)
-        data = [generate_fake_transaction() for _ in range(number)]
+
+# class TransactionResource(ConfigurableResource):
+#     seed: int
+#
+#     @property
+#     def random(self) -> Random:
+#         return Random(self.seed)
+#
+#     def get_transactions_data(self):
+#         number = self.random.randrange(40, 50)
+#         data = [generate_fake_transaction() for _ in range(number)]
+#         return data
+
+
+class POSResource(RandomizedConfigurableResource):
+    def get_pos_data(self):
+        data = generate_fake_pos(self.num)
         return data
 
 
+class InventoryResource(RandomizedConfigurableResource):
+    def get_inventory_data(self):
+        data = generate_fake_asset(self.num)
+        return data
 
+
+class CustomerManagementResource(RandomizedConfigurableResource):
+    def get_crm_data(self):
+        data = generate_fake_crm(self.num)
+        return data
+
+
+class PaymentGatewayResource(RandomizedConfigurableResource):
+    def get_payment_data(self):
+        data = generate_fake_pos(self.num)
 
 
 
