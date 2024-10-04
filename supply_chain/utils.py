@@ -1,7 +1,9 @@
+import datetime
 from faker import Faker
 import json
 import os
 import random
+from typing import List, Dict, Any
 
 
 fake = Faker()
@@ -33,7 +35,8 @@ def write_payment_data(payments_data):
         payments_data (List[dict]): The list of payment transactions to write.
     """
     with open(PAYMENT_FILE_PATH, "w") as file:
-        json.dump(payments_data, file, indent=4)
+        json_data = convert_to_json_serializable(payments_data)
+        json.dump(json_data, file, indent=4)
 
 
 def generate_fake_transaction():
@@ -275,3 +278,50 @@ def convert_transaction_data(original_data):
 
     return flattened_data
 
+
+# def convert_to_json_serializable(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+#     """Convert a list of customer data dictionaries to a JSON-serializable format."""
+#
+#     json_serializable_data = []
+#
+#     for record in data:
+#         # Create a copy of the record to avoid modifying the original
+#         serializable_record = record.copy()
+#
+#         # Convert datetime.date objects to string format
+#         for key, value in record.items():
+#             if isinstance(value, datetime.date):
+#                 serializable_record[key] = value.isoformat()  # Convert to string (ISO format)
+#
+#         json_serializable_data.append(serializable_record)
+#
+#     return json_serializable_data
+
+
+# recursive convert
+def convert_to_json_serializable(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Convert a list of customer data dictionaries to a JSON-serializable format."""
+
+    def convert_value(value: Any) -> Any:
+        """Recursively convert datetime objects to string format."""
+        if isinstance(value, datetime.date):
+            return value.strftime('%Y-%m-%d')  # Format as desired
+        elif isinstance(value, dict):
+            return convert_to_json_serializable([value])[0]  # Recursively process dictionaries
+        elif isinstance(value, list):
+            return [convert_value(item) for item in value]  # Recursively process lists
+        return value  # Return the value as is if not datetime or collection
+
+    json_serializable_data = []
+
+    for record in data:
+        # Create a copy of the record to avoid modifying the original
+        serializable_record = record.copy()
+
+        # Convert all values in the record
+        for key, value in serializable_record.items():
+            serializable_record[key] = convert_value(value)
+
+        json_serializable_data.append(serializable_record)
+
+    return json_serializable_data
