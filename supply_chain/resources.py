@@ -13,19 +13,6 @@ class RandomizedConfigurableResource(ConfigurableResource):
         return Random(self.seed)
 
 
-# class TransactionResource(ConfigurableResource):
-#     seed: int
-#
-#     @property
-#     def random(self) -> Random:
-#         return Random(self.seed)
-#
-#     def get_transactions_data(self):
-#         number = self.random.randrange(40, 50)
-#         data = [generate_fake_transaction() for _ in range(number)]
-#         return data
-
-
 class POSResource(RandomizedConfigurableResource):
     def get_pos_data(self):
         data = generate_fake_pos(self.num)
