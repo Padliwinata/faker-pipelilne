@@ -1,6 +1,9 @@
-from dagster import asset, AssetExecutionContext, MaterializeResult
+from dagster import asset, AssetExecutionContext, MaterializeResult, load_assets_from_modules
 
-from supply_chain.assets import all_assets
+import supply_chain.crm.assets as crm
+import supply_chain.pos.assets as pos
+import supply_chain.inventory.assets as inventory
+
 from supply_chain.utils import convert_to_json_serializable
 
 
@@ -15,4 +18,8 @@ def final_reporting(context: AssetExecutionContext, customer_segmentation: list[
     )
 
 
-all_assets = all_assets + [final_reporting]
+crm_assets = load_assets_from_modules([crm], group_name='crm_assets')
+pos_assets = load_assets_from_modules([pos], group_name='pos_assets')
+inventory_assets = load_assets_from_modules([inventory], group_name='inventory_assets')
+
+all_assets = crm_assets + pos_assets + inventory_assets + [final_reporting]

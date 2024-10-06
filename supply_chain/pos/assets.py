@@ -1,6 +1,6 @@
 from dagster import asset, AssetExecutionContext, Output, MetadataValue
 
-from supply_chain.resources.pos import POSResource
+from supply_chain.pos.resources import POSResource
 from supply_chain.utils import convert_to_json_serializable
 
 
@@ -41,5 +41,3 @@ def payment_reconciliation_report(context: AssetExecutionContext, sales_summary:
             'preview': MetadataValue.json(json_data)
         }
     )
-
-

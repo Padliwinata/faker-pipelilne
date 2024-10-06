@@ -1,6 +1,6 @@
-from dagster import AssetExecutionContext, Output, asset, MetadataValue
+from dagster import asset, AssetExecutionContext, Output, MetadataValue
 
-from supply_chain.resources.inventory import InventoryResource
+from supply_chain.inventory.resources import InventoryResource
 from supply_chain.utils import convert_to_json_serializable
 
 

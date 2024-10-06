@@ -1,4 +1,4 @@
-from supply_chain.resources.base import RandomizedConfigurableResource
+from supply_chain.base.resource import RandomizedConfigurableResource
 from supply_chain.utils import generate_fake_pos
 
 

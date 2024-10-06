@@ -1,6 +1,6 @@
 from dagster import asset, AssetExecutionContext, Output, MetadataValue
 
-from supply_chain.resources.crm import CustomerManagementResource
+from supply_chain.crm.resources import CustomerManagementResource
 from supply_chain.utils import convert_to_json_serializable
 
 
