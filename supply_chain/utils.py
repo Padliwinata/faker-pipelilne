@@ -1,9 +1,11 @@
 import datetime
-from faker import Faker
 import json
 import os
 import random
 from typing import List, Dict, Any
+
+from faker import Faker
+import pandas as pd
 
 
 fake = Faker()
@@ -325,3 +327,38 @@ def convert_to_json_serializable(data: List[Dict[str, Any]]) -> List[Dict[str, A
         json_serializable_data.append(serializable_record)
 
     return json_serializable_data
+
+
+def flatten_transaction_data(data):
+    """
+    Takes a list of transaction dictionaries and converts it to a flattened pandas DataFrame.
+
+    :param data: List of dictionaries containing transaction data
+    :return: Pandas DataFrame with flattened structure
+    """
+    # Initialize an empty list to hold flattened data
+    flattened_data = []
+
+    # Loop over each transaction
+    for entry in data:
+        # Loop over items to create individual rows
+        for item in entry['items']:
+            # Create a new dictionary for each item
+            flattened_row = {
+                "customer_id": entry["customer_id"],
+                "item_name": item["item_name"],
+                "price_per_unit": item["price_per_unit"],
+                "quantity": item["quantity"],
+                "total_item_price": item["price_per_unit"] * item["quantity"],
+                "transaction_date": entry["transaction_date"],
+                "transaction_id": entry["transaction_id"],
+                "payment_method": entry["payment_info"]["payment_method"],
+                "payment_status": entry["payment_info"]["payment_status"],
+                "total_amount": entry["total_amount"],
+                "confirmation_code": entry["payment_info"]["confirmation_code"]
+            }
+            # Append the flattened row to the list
+            flattened_data.append(flattened_row)
+
+    # Convert the list of flattened data into a DataFrame
+    return pd.DataFrame(flattened_data)
