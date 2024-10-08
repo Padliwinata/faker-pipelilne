@@ -1,30 +1,23 @@
-# Use an official Python image
+# Use an official Python runtime as a parent image
 FROM python:3.9-slim
+
+# Set the working directory in the container
+WORKDIR /opt/dagster
+
+# Copy the current directory contents into the container at /opt/dagster
+COPY . .
+
+# Install Dagster and necessary packages
+RUN pip install dagster dagster-postgres
+
+# Create the Dagster home directory
+RUN mkdir -p /opt/dagster/dagster_home
 
 # Set environment variables
 ENV DAGSTER_HOME=/opt/dagster/dagster_home
 
-# Create dagster home directory
-RUN mkdir -p $DAGSTER_HOME
-
-# Set the working directory inside the container
-WORKDIR /opt/dagster
-
-# Copy the current directory (your project) into the container
-COPY . .
-
-# Install any necessary dependencies
-RUN pip install dagster dagit dagster-postgres
-
-# Create dagster home directory
-RUN mkdir -p /opt/dagster/dagster_home
-
-# Set the DAGSTER_HOME environment variable
-ENV DAGSTER_HOME=/opt/dagster/dagster_home
-
-
-# Expose the port for dagster webserver
+# Expose port for Dagster webserver
 EXPOSE 3000
 
-# Run Dagster webserver
+# Command to run Dagster webserver
 CMD ["dagster-webserver", "-h", "0.0.0.0", "-p", "3000"]
