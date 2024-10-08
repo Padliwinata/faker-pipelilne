@@ -16,6 +16,13 @@ COPY . .
 # Install any necessary dependencies
 RUN pip install dagster dagit dagster-postgres
 
+# Create dagster home directory
+RUN mkdir -p /opt/dagster/dagster_home
+
+# Set the DAGSTER_HOME environment variable
+ENV DAGSTER_HOME=/opt/dagster/dagster_home
+
+
 # Expose the port for dagster webserver
 EXPOSE 3000
 
