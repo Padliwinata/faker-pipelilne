@@ -1,12 +1,9 @@
 import datetime
+from faker import Faker
 import json
 import os
 import random
 from typing import List, Dict, Any
-
-from faker import Faker
-import numpy as np
-import pandas as pd
 
 
 fake = Faker()
@@ -309,14 +306,12 @@ def convert_to_json_serializable(data: Any) -> Any:
         """Recursively convert non-serializable types to serializable format."""
         if isinstance(value, datetime.date):
             return value.strftime('%Y-%m-%d')  # Format as desired
-        elif isinstance(value, np.int64):
-            return int(value)  # Convert np.int64 to int
-        elif isinstance(value, np.float64):
-            return float(value)  # Convert np.float64 to float
         elif isinstance(value, dict):
             return convert_to_json_serializable(value)  # Recursively process dictionaries
         elif isinstance(value, list):
             return [convert_value(item) for item in value]  # Recursively process lists
+        elif isinstance(value, (int, float)):  # Convert numpy types
+            return value
         return value  # Return the value as is if not datetime or collection
 
     if isinstance(data, list):
@@ -336,83 +331,7 @@ def convert_to_json_serializable(data: Any) -> Any:
         serializable_record = data.copy()
         for key, value in serializable_record.items():
             serializable_record[key] = convert_value(value)
-        return serializable_record
-    else:
-        raise ValueError("Input must be a list of dictionaries or a single dictionary.")
 
+        return serializable_record  # Directly return the modified dictionary
 
-def flatten_transaction_data(data):
-    """
-    Takes a list of transaction dictionaries and converts it to a flattened pandas DataFrame.
-
-    :param data: List of dictionaries containing transaction data
-    :return: Pandas DataFrame with flattened structure
-    """
-    # Initialize an empty list to hold flattened data
-    flattened_data = []
-
-    # Loop over each transaction
-    for entry in data:
-        # Loop over items to create individual rows
-        for item in entry['items']:
-            # Create a new dictionary for each item
-            flattened_row = {
-                "customer_id": entry["customer_id"],
-                "item_name": item["item_name"],
-                "price_per_unit": item["price_per_unit"],
-                "quantity": item["quantity"],
-                "total_item_price": item["price_per_unit"] * item["quantity"],
-                "transaction_date": entry["transaction_date"],
-                "transaction_id": entry["transaction_id"],
-                "payment_method": entry["payment_info"]["payment_method"],
-                "payment_status": entry["payment_info"]["payment_status"],
-                "total_amount": entry["total_amount"],
-                "confirmation_code": entry["payment_info"]["confirmation_code"]
-            }
-            # Append the flattened row to the list
-            flattened_data.append(flattened_row)
-
-    # Convert the list of flattened data into a DataFrame
-    return pd.DataFrame(flattened_data)
-
-
-def analyze_inventory(data: List[Dict[str, Any]]) -> Dict[str, Any]:
-    # Create DataFrame
-    df = pd.DataFrame(data)
-
-    # Convert 'last_stocked' to datetime
-    df['last_stocked'] = pd.to_datetime(df['last_stocked'])
-
-    # Perform simple analysis
-    summary = {
-        'total_items': df.shape[0],
-        'total_stock': df['stock_quantity'].sum(),
-        'average_price': df['price_per_unit'].mean(),
-        'most_recent_stocked': df['last_stocked'].max(),
-        'least_recent_stocked': df['last_stocked'].min(),
-    }
-
-    # Prepare metadata for Dagster materialization
-    metadata = {
-        "schema": {
-            "fields": [
-                {"name": "total_items", "type": "int"},
-                {"name": "total_stock", "type": "int"},
-                {"name": "average_price", "type": "float"},
-                {"name": "most_recent_stocked", "type": "datetime"},
-                {"name": "least_recent_stocked", "type": "datetime"},
-            ]
-        },
-        "values": {
-            "total_items": summary['total_items'],
-            "total_stock": summary['total_stock'],
-            "average_price": summary['average_price'],
-            "most_recent_stocked": summary['most_recent_stocked'].isoformat(),
-            "least_recent_stocked": summary['least_recent_stocked'].isoformat(),
-        }
-    }
-
-    return {
-        "summary": summary,
-        "metadata": metadata
-    }
+    return data  # Return the original data if it's neither a list nor a dict
