@@ -64,15 +64,3 @@ def sales_summary(context: AssetExecutionContext, cleaned_sales_data: pd.DataFra
         }
     )
 
-
-# @asset
-# def payment_reconciliation_report(context: AssetExecutionContext, sales_summary: list[dict]) -> Output:
-#     reconciliation_report = sales_summary
-#     json_data = convert_to_json_serializable(reconciliation_report)
-#     # context.log.info(reconciliation_report)
-#     return Output(
-#         value=reconciliation_report,
-#         metadata={
-#             'preview': MetadataValue.json(json_data)
-#         }
-#     )

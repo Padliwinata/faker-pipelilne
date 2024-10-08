@@ -1,30 +1,19 @@
-# Use an official Python image
-FROM python:3.9-slim
+FROM python:3.10-slim
 
-# Set environment variables
-ENV DAGSTER_HOME=/opt/dagster/dagster_home
+RUN mkdir -p /opt/dagster/dagster_home /opt/dagster/app
 
-# Create dagster home directory
-RUN mkdir -p $DAGSTER_HOME
+RUN pip install dagster-webserver dagster-postgres dagster-aws
 
-# Set the working directory inside the container
-WORKDIR /opt/dagster
+# Copy your code and workspace to /opt/dagster/app
+COPY workspace.yaml /opt/dagster/app/
 
-# Copy the current directory (your project) into the container
-COPY . .
+ENV DAGSTER_HOME=/opt/dagster/dagster_home/
 
-# Install any necessary dependencies
-RUN pip install dagster dagit dagster-postgres
+# Copy dagster instance YAML to $DAGSTER_HOME
+COPY dagster.yaml /opt/dagster/dagster_home/
 
-# Create dagster home directory
-RUN mkdir -p /opt/dagster/dagster_home
+WORKDIR /opt/dagster/app
 
-# Set the DAGSTER_HOME environment variable
-ENV DAGSTER_HOME=/opt/dagster/dagster_home
-
-
-# Expose the port for dagster webserver
 EXPOSE 3000
 
-# Run Dagster webserver
-CMD ["dagster-webserver", "-h", "0.0.0.0", "-p", "3000"]
+ENTRYPOINT ["dagster-webserver", "-h", "0.0.0.0", "-p", "3000"]

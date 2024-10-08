@@ -8,7 +8,7 @@ from supply_chain.utils import convert_to_json_serializable
 
 
 @asset
-def final_reporting(context: AssetExecutionContext, customer_segmentation: list[dict], sales_summary: dict, inventory_report: list[dict]) -> MaterializeResult:
+def final_reporting(context: AssetExecutionContext, customer_segmentation: list[dict], sales_summary: dict, inventory_report: dict) -> MaterializeResult:
     return MaterializeResult(
         metadata={
             'customer_data': convert_to_json_serializable(customer_segmentation),

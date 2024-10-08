@@ -1,0 +1,22 @@
+[32m2024-10-08 19:25:10 +0700[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 89378d51-1309-4a5c-8156-e1dbce022bba - 37335 - LOGS_CAPTURED - Started capturing logs in process (pid: 37335).
+[32m2024-10-08 19:25:10 +0700[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 89378d51-1309-4a5c-8156-e1dbce022bba - 37335 - final_reporting - STEP_START - Started execution of step "final_reporting".
+[32m2024-10-08 19:25:10 +0700[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 89378d51-1309-4a5c-8156-e1dbce022bba - final_reporting - Loading file from: /Users/rpadliwinata/PycharmProjects/dgs/supply-chain/tmphpcsp6ss/storage/customer_segmentation using PickledObjectFilesystemIOManager...
+[32m2024-10-08 19:25:10 +0700[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 89378d51-1309-4a5c-8156-e1dbce022bba - 37335 - final_reporting - LOADED_INPUT - Loaded input "customer_segmentation" using input manager "io_manager", from output "result" of step "customer_segmentation"
+[32m2024-10-08 19:25:10 +0700[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 89378d51-1309-4a5c-8156-e1dbce022bba - final_reporting - Loading file from: /Users/rpadliwinata/PycharmProjects/dgs/supply-chain/tmphpcsp6ss/storage/inventory_report using PickledObjectFilesystemIOManager...
+[32m2024-10-08 19:25:10 +0700[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 89378d51-1309-4a5c-8156-e1dbce022bba - 37335 - final_reporting - LOADED_INPUT - Loaded input "inventory_report" using input manager "io_manager", from output "result" of step "inventory_report"
+[32m2024-10-08 19:25:10 +0700[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 89378d51-1309-4a5c-8156-e1dbce022bba - final_reporting - Loading file from: /Users/rpadliwinata/PycharmProjects/dgs/supply-chain/tmphpcsp6ss/storage/sales_summary using PickledObjectFilesystemIOManager...
+[32m2024-10-08 19:25:10 +0700[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 89378d51-1309-4a5c-8156-e1dbce022bba - 37335 - final_reporting - LOADED_INPUT - Loaded input "sales_summary" using input manager "io_manager", from output "result" of step "sales_summary"
+[32m2024-10-08 19:25:10 +0700[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 89378d51-1309-4a5c-8156-e1dbce022bba - 37335 - final_reporting - STEP_INPUT - Got input "customer_segmentation" of type "[dict]". (Type check passed).
+[32m2024-10-08 19:25:10 +0700[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 89378d51-1309-4a5c-8156-e1dbce022bba - 37335 - final_reporting - STEP_INPUT - Got input "inventory_report" of type "[dict]". Warning! Type check failed.
+[32m2024-10-08 19:25:10 +0700[0m - dagster - [34mERROR[0m - [31m__ASSET_JOB - 89378d51-1309-4a5c-8156-e1dbce022bba - 37335 - final_reporting - STEP_FAILURE - Execution of step "final_reporting" failed.
+
+dagster._core.errors.DagsterTypeCheckDidNotPass: Type check failed for step input "inventory_report" - expected type "[dict]". Description: Value "{'summary': {'total_items': 10, 'total_stock': np.int64(498), 'average_price': np.float64(45.079), 'most_recent_stocked': Timestamp('2024-09-24 00:00:00'), 'least_recent_stocked': Timestamp('2024-01-18 00:00:00')}, 'metadata': {'schema': {'fields': [{'name': 'total_items', 'type': 'int'}, {'name': 'total_stock', 'type': 'int'}, {'name': 'average_price', 'type': 'float'}, {'name': 'most_recent_stocked', 'type': 'datetime'}, {'name': 'least_recent_stocked', 'type': 'datetime'}]}, 'values': {'total_items': 10, 'total_stock': np.int64(498), 'average_price': np.float64(45.079), 'most_recent_stocked': '2024-09-24T00:00:00', 'least_recent_stocked': '2024-01-18T00:00:00'}}}" of python type "dict" must be a list.
+
+Stack Trace:
+  File "/Users/rpadliwinata/miniconda3/envs/dgs/lib/python3.11/site-packages/dagster/_core/execution/plan/execute_plan.py", line 245, in dagster_event_sequence_for_step
+    for step_event in check.generator(step_events):
+  File "/Users/rpadliwinata/miniconda3/envs/dgs/lib/python3.11/site-packages/dagster/_core/execution/plan/execute_step.py", line 475, in core_dagster_event_sequence_for_step
+    for evt in check.generator(
+  File "/Users/rpadliwinata/miniconda3/envs/dgs/lib/python3.11/site-packages/dagster/_core/execution/plan/execute_step.py", line 372, in _type_checked_event_sequence_for_input
+    raise DagsterTypeCheckDidNotPass(
+[0m

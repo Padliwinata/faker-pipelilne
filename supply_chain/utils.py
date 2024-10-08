@@ -5,6 +5,7 @@ import random
 from typing import List, Dict, Any
 
 from faker import Faker
+import numpy as np
 import pandas as pd
 
 
@@ -301,32 +302,43 @@ def convert_transaction_data(original_data):
 
 
 # recursive convert
-def convert_to_json_serializable(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Convert a list of customer data dictionaries to a JSON-serializable format."""
+def convert_to_json_serializable(data: Any) -> Any:
+    """Convert a list of dictionaries, a single dictionary, or a complex structure to a JSON-serializable format."""
 
     def convert_value(value: Any) -> Any:
-        """Recursively convert datetime objects to string format."""
+        """Recursively convert non-serializable types to serializable format."""
         if isinstance(value, datetime.date):
             return value.strftime('%Y-%m-%d')  # Format as desired
+        elif isinstance(value, np.int64):
+            return int(value)  # Convert np.int64 to int
+        elif isinstance(value, np.float64):
+            return float(value)  # Convert np.float64 to float
         elif isinstance(value, dict):
-            return convert_to_json_serializable([value])[0]  # Recursively process dictionaries
+            return convert_to_json_serializable(value)  # Recursively process dictionaries
         elif isinstance(value, list):
             return [convert_value(item) for item in value]  # Recursively process lists
         return value  # Return the value as is if not datetime or collection
 
-    json_serializable_data = []
+    if isinstance(data, list):
+        json_serializable_data = []
+        for record in data:
+            # Create a copy of the record to avoid modifying the original
+            serializable_record = record.copy()
 
-    for record in data:
-        # Create a copy of the record to avoid modifying the original
-        serializable_record = record.copy()
+            # Convert all values in the record
+            for key, value in serializable_record.items():
+                serializable_record[key] = convert_value(value)
 
-        # Convert all values in the record
+            json_serializable_data.append(serializable_record)
+        return json_serializable_data
+    elif isinstance(data, dict):
+        # Process a single dictionary
+        serializable_record = data.copy()
         for key, value in serializable_record.items():
             serializable_record[key] = convert_value(value)
-
-        json_serializable_data.append(serializable_record)
-
-    return json_serializable_data
+        return serializable_record
+    else:
+        raise ValueError("Input must be a list of dictionaries or a single dictionary.")
 
 
 def flatten_transaction_data(data):
@@ -362,3 +374,45 @@ def flatten_transaction_data(data):
 
     # Convert the list of flattened data into a DataFrame
     return pd.DataFrame(flattened_data)
+
+
+def analyze_inventory(data: List[Dict[str, Any]]) -> Dict[str, Any]:
+    # Create DataFrame
+    df = pd.DataFrame(data)
+
+    # Convert 'last_stocked' to datetime
+    df['last_stocked'] = pd.to_datetime(df['last_stocked'])
+
+    # Perform simple analysis
+    summary = {
+        'total_items': df.shape[0],
+        'total_stock': df['stock_quantity'].sum(),
+        'average_price': df['price_per_unit'].mean(),
+        'most_recent_stocked': df['last_stocked'].max(),
+        'least_recent_stocked': df['last_stocked'].min(),
+    }
+
+    # Prepare metadata for Dagster materialization
+    metadata = {
+        "schema": {
+            "fields": [
+                {"name": "total_items", "type": "int"},
+                {"name": "total_stock", "type": "int"},
+                {"name": "average_price", "type": "float"},
+                {"name": "most_recent_stocked", "type": "datetime"},
+                {"name": "least_recent_stocked", "type": "datetime"},
+            ]
+        },
+        "values": {
+            "total_items": summary['total_items'],
+            "total_stock": summary['total_stock'],
+            "average_price": summary['average_price'],
+            "most_recent_stocked": summary['most_recent_stocked'].isoformat(),
+            "least_recent_stocked": summary['least_recent_stocked'].isoformat(),
+        }
+    }
+
+    return {
+        "summary": summary,
+        "metadata": metadata
+    }
