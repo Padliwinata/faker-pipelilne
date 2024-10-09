@@ -29,8 +29,6 @@ def sales_summary(context: AssetExecutionContext, cleaned_sales_data: list[dict]
         }
     )
 
-<<<<<<< HEAD
-=======
 
 @asset
 def payment_reconciliation_report(context: AssetExecutionContext, sales_summary: list[dict]) -> Output:
@@ -43,4 +41,4 @@ def payment_reconciliation_report(context: AssetExecutionContext, sales_summary:
             'preview': MetadataValue.json(json_data)
         }
     )
->>>>>>> parent of 0563fa1 (refined process node)
+

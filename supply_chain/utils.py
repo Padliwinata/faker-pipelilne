@@ -4,6 +4,8 @@ import json
 import os
 import random
 from typing import List, Dict, Any
+import numpy as np
+import pandas as pd
 
 
 fake = Faker()
@@ -306,12 +308,14 @@ def convert_to_json_serializable(data: Any) -> Any:
         """Recursively convert non-serializable types to serializable format."""
         if isinstance(value, datetime.date):
             return value.strftime('%Y-%m-%d')  # Format as desired
+        elif isinstance(value, np.int64):
+            return int(value)  # Convert np.int64 to int
+        elif isinstance(value, np.float64):
+            return float(value)  # Convert np.float64 to float
         elif isinstance(value, dict):
             return convert_to_json_serializable(value)  # Recursively process dictionaries
         elif isinstance(value, list):
             return [convert_value(item) for item in value]  # Recursively process lists
-        elif isinstance(value, (int, float)):  # Convert numpy types
-            return value
         return value  # Return the value as is if not datetime or collection
 
     if isinstance(data, list):
@@ -331,7 +335,48 @@ def convert_to_json_serializable(data: Any) -> Any:
         serializable_record = data.copy()
         for key, value in serializable_record.items():
             serializable_record[key] = convert_value(value)
+        return serializable_record
+    else:
+        raise ValueError("Input must be a list of dictionaries or a single dictionary.")
 
-        return serializable_record  # Directly return the modified dictionary
 
-    return data  # Return the original data if it's neither a list nor a dict
+def analyze_inventory(data: List[Dict[str, Any]]) -> Dict[str, Any]:
+    # Create DataFrame
+    df = pd.DataFrame(data)
+
+    # Convert 'last_stocked' to datetime
+    df['last_stocked'] = pd.to_datetime(df['last_stocked'])
+
+    # Perform simple analysis
+    summary = {
+        'total_items': df.shape[0],
+        'total_stock': df['stock_quantity'].sum(),
+        'average_price': df['price_per_unit'].mean(),
+        'most_recent_stocked': df['last_stocked'].max(),
+        'least_recent_stocked': df['last_stocked'].min(),
+    }
+
+    # Prepare metadata for Dagster materialization
+    metadata = {
+        "schema": {
+            "fields": [
+                {"name": "total_items", "type": "int"},
+                {"name": "total_stock", "type": "int"},
+                {"name": "average_price", "type": "float"},
+                {"name": "most_recent_stocked", "type": "datetime"},
+                {"name": "least_recent_stocked", "type": "datetime"},
+            ]
+        },
+        "values": {
+            "total_items": summary['total_items'],
+            "total_stock": summary['total_stock'],
+            "average_price": summary['average_price'],
+            "most_recent_stocked": summary['most_recent_stocked'].isoformat(),
+            "least_recent_stocked": summary['least_recent_stocked'].isoformat(),
+        }
+    }
+
+    return {
+        "summary": summary,
+        "metadata": metadata
+    }
