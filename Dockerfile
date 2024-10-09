@@ -6,7 +6,7 @@ RUN pip install dagster-webserver dagster-postgres dagster-aws
 RUN pip install ".[dev]"
 
 # Copy your code and workspace to /opt/dagster/app
-COPY workspace.yaml /opt/dagster/app/
+# COPY workspace.yaml /opt/dagster/app/
 
 COPY . /opt/dagster/app
 
