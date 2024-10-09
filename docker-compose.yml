@@ -7,19 +7,3 @@ services:
       - DAGSTER_HOME=/opt/dagster/dagster_home
     volumes:
       - ./dagster_home:/opt/dagster/dagster_home  # Mount your dagster_home directory
-    depends_on:
-      - postgres
-
-  postgres:
-    image: postgres:13
-    environment:
-      POSTGRES_USER: dagster
-      POSTGRES_PASSWORD: dagster
-      POSTGRES_DB: dagster
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
