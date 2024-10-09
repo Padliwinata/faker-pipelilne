@@ -3,6 +3,7 @@ FROM python:3.11-slim
 RUN mkdir -p /opt/dagster/dagster_home /opt/dagster/app
 COPY . /opt/dagster/app
 WORKDIR /opt/dagster/app
+RUN touch /opt/dagster/dagster_home/dagster.yaml
 
 RUN pip install dagster-webserver dagster-postgres dagster-aws
 RUN pip install ".[dev]"

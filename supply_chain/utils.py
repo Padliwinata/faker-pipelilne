@@ -36,6 +36,7 @@ def write_payment_data(payments_data):
     Args:
         payments_data (List[dict]): The list of payment transactions to write.
     """
+    os.makedirs('data', exist_ok=True)
     with open(PAYMENT_FILE_PATH, "w") as file:
         json_data = convert_to_json_serializable(payments_data)
         json.dump(json_data, file, indent=4)
