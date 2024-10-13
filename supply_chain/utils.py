@@ -282,25 +282,6 @@ def convert_transaction_data(original_data):
     return flattened_data
 
 
-# def convert_to_json_serializable(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-#     """Convert a list of customer data dictionaries to a JSON-serializable format."""
-#
-#     json_serializable_data = []
-#
-#     for record in data:
-#         # Create a copy of the record to avoid modifying the original
-#         serializable_record = record.copy()
-#
-#         # Convert datetime.date objects to string format
-#         for key, value in record.items():
-#             if isinstance(value, datetime.date):
-#                 serializable_record[key] = value.isoformat()  # Convert to string (ISO format)
-#
-#         json_serializable_data.append(serializable_record)
-#
-#     return json_serializable_data
-
-
 # recursive convert
 def convert_to_json_serializable(data: Any) -> Any:
     """Convert a list of dictionaries, a single dictionary, or a complex structure to a JSON-serializable format."""
