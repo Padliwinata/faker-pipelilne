@@ -21,6 +21,8 @@ def cleaned_sales_data(context: AssetExecutionContext, pos_resource: POSResource
 def sales_summary(context: AssetExecutionContext, cleaned_sales_data: list[dict]) -> Output:
     summarized_data = cleaned_sales_data
     json_data = convert_to_json_serializable(summarized_data)
+    # This part for summarizing data from cleaned data
+    # but currently I'm on my progress to setup my personal server so this is it
     # context.log.info(summarized_data)
     return Output(
         value=summarized_data,
@@ -33,6 +35,8 @@ def sales_summary(context: AssetExecutionContext, cleaned_sales_data: list[dict]
 @asset
 def payment_reconciliation_report(context: AssetExecutionContext, sales_summary: list[dict]) -> Output:
     reconciliation_report = sales_summary
+    # This part for reporting summarized
+    # but currently I'm on my progress to setup my personal server so this is it
     json_data = convert_to_json_serializable(reconciliation_report)
     # context.log.info(reconciliation_report)
     return Output(
